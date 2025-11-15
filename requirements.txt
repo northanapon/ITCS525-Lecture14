@@ -1,0 +1,9 @@
+fastapi
+fastapi[standard]
+sqlalchemy
+sqlmodel
+psycopg2-binary
+pytest
+asteval
+pydantic
+
