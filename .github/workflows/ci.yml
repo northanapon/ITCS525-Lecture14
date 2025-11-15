@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: appuser
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: appdb
+        ports:
+          - 5432:5432
+        # Wait for Postgres to be ready
+        options: >-
+          --health-cmd "pg_isready -U appuser -d appdb"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # Match your app’s expectation
+      DATABASE_URL: postgresql://appuser:password@localhost:5432/appdb
+      # Use a test-specific settings if you have them
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          pytest -vv
