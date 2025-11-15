@@ -1,0 +1,25 @@
+services:
+  backend:
+    build: .
+    ports:
+      - 34242:5000
+    volumes:
+      - .:/app
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: postgresql://appuser:password@database:5432/appdb
+    depends_on:
+      - database
+  database:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: appdb
+    ports:
+      - "54242:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+volumes:
+  dbdata:
